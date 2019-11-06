@@ -1,3 +1,3 @@
-# telegram-site-monitoring
+# TgFinance
 
 Simple Telegram bot for money management 
