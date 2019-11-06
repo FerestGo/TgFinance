@@ -1,2 +1,19 @@
-.idea
-.telegram-site-monitoring
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+Thumbs.db
+.DS_Store
+
+debug/
+.idea/
+nbproject
+
+postgres_data/
+.env
+.env.local
+docker-compose.yml
+
+*.sql

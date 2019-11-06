@@ -10,6 +10,7 @@ import (
 
 var (
 	telegramBotToken string
+	config           Config
 )
 
 func init() {
@@ -22,8 +23,7 @@ func init() {
 }
 
 func main() {
-	// используя токен создаем новый инстанс бота
-	bot, err := tgbotapi.NewBotAPI(telegramBotToken)
+	bot, err := tgbotapi.NewBotAPI(config["TOKEN"])
 	if err != nil {
 		log.Panic(err)
 	}
