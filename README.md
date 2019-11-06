@@ -1,5 +1,3 @@
-# telegram-site-monitoring
-[![Build Status](https://travis-ci.org/fote/telegram-site-monitoring.svg?branch=master)](https://travis-ci.org/fote/telegram-site-monitoring)
+# TgFinance
 
-
-Simple Telegram bot for monitoring sites
+Simple Telegram bot for money management 
