@@ -1,69 +1,54 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"github.com/Syfaro/telegram-bot-api"
-	"log"
-	"os"
+	"regexp"
 )
-
-var (
-	telegramBotToken string
-	config           Config
-)
-
-func init() {
-	flag.StringVar(&telegramBotToken, "telegrambottoken", "757997705:AAGVgtuQJh2z4aK-Qb72WDpuw7-asIY-feM", "Telegram Bot Token")
-	flag.Parse()
-	if telegramBotToken == "" {
-		log.Print("-telegrambottoken is required")
-		os.Exit(1)
-	}
-}
 
 func main() {
-	bot, err := tgbotapi.NewBotAPI(config["TOKEN"])
-	if err != nil {
-		log.Panic(err)
+	db := GetDB()
+	var reply string
+	pattern := `\d\s\w`
+	command := "1000 Products"
+	flag, _ := regexp.MatchString(pattern, command)
+
+	if command == "/start" {
+		reply = "Это телега бот"
 	}
-	log.Printf("Authorized on account %s", bot.Self.UserName)
-
-	// u - структура с конфигом для получения апдейтов
-	_, err = bot.RemoveWebhook()
-	fmt.Println(err)
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-	// используя конфиг u создаем канал в который будут прилетать новые сообщения
-	updates, err := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		// универсальный ответ на любое сообщение
-		reply := "Не знаю что сказать"
-		if update.Message == nil {
-			continue
-		}
-
-		// логируем от кого какое сообщение пришло
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-		switch update.Message.Command() {
-		case "start":
-			reply = "Привет. Я телеграм-бот"
-		case "hello":
-			reply = "world"
-		case "key":
-			var markup tgbotapi.InlineKeyboardMarkup
-			edit := tgbotapi.NewEditMessageText(
-				update.Message.Chat.ID,
-				update.Message.MessageID,
-				"sample text",
-			)
-			edit.ReplyMarkup = &markup
-			reply = "Привет. Я телеграм-бот"
-		}
-
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, reply)
-		bot.Send(msg)
+	if flag == true {
+		var transaction Transaction
+		db.Last(&transaction)
+		fmt.Println(&transaction)
+		fmt.Println(reply)
 	}
+	fmt.Println("thats all")
+	// db := InitDb()
+	// Чтение
+	// user := new(User)
+	// transaction := new(Transaction)
+
+	// var user User
+	// var transaction Transaction
+	// db.First(&user, 1) // find product with id 1
+	// addTranstction(11, 11, "Products")
+	// db.Last(&transaction)
+	// fmt.Println(&transaction)
+
 }
+
+// func addTranstction(TelegramId int, Amount float64, Name string) {
+//  db, err := gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=fman password=root sslmode=disable")
+//  if err != nil {
+//   panic(err)
+// }
+// defer db.Close()
+// var user User
+// // var transaction Transaction
+// db.Where("telegram_id = ?", TelegramId).First(&user)
+// db.Create(&Transaction{
+//   UserID:user.ID,
+//   Type:"day",
+//   Name:Name,
+//   Amount: Amount})
+
+// }
