@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -15,6 +16,7 @@ type User struct {
 
 type Transaction struct {
 	gorm.Model
+	ID     uint `gorm:"primary_key"`
 	UserID int
 	User   User
 	Date   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
@@ -23,18 +25,17 @@ type Transaction struct {
 	Amount float64
 }
 
-var db *gorm.DB //база данных
+var db *gorm.DB
 
-func init() {
-	db, err := gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=fman password=root sslmode=disable")
+func initDB() *gorm.DB {
+	config = GetConfig() // todo get config in main()
+	agrs := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+		config["POSTGRES_HOST"], config["POSTGRES_PORT"], config["DATABASE_USER"], config["DATABASE_NAME"], config["DATABASE_PASSWORD"])
+	db, err := gorm.Open("postgres", agrs)
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
-
+	//db.LogMode(true)
 	db.AutoMigrate(&User{}, &Transaction{})
-}
-
-func GetDB() *gorm.DB {
 	return db
 }
