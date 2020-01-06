@@ -9,15 +9,13 @@ import (
 )
 
 type User struct {
-	gorm.Model
-	ID         int
+	ID         uint `gorm:"primary_key"`
 	TelegramId int
 }
 
 type Transaction struct {
-	gorm.Model
 	ID     uint `gorm:"primary_key"`
-	UserID int
+	UserID uint
 	User   User
 	Date   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 	Type   string
