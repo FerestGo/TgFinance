@@ -19,13 +19,16 @@ func newTransaction(command string, telegramId int) (response string) {
 	amountPattern := regexp.MustCompile(`(\d+)`)
 	amountString := amountPattern.FindString(command)
 	amount, err := strconv.Atoi(amountString)
+	amount = amount * -1
 
 	if err != nil || amount == 0 {
 		return
 	}
 
 	addTransaction(telegramId, amount, name)
-	response = "Добавлено. Остаток сегодня: num"
+	var budget Budget
+	budget.Get(userId(telegramId))
+	response = "Добавлено. Остаток сегодня: " + strconv.Itoa(budget.TodayBudget)
 	return response
 }
 
@@ -45,18 +48,44 @@ func Today(command string, telegramId int) (response string) {
 
 type Budget struct {
 	Income      int
+	DailyBudget int
+	SumCosts    int
 	TodayBudget int
+}
+
+func (budget *Budget) Get(userId uint) {
+	db.Table("transactions").Select("sum(amount) as income").
+		Where(map[string]interface{}{"type": "month", "user_id": userId}).
+		Scan(budget)
+	budget.DailyBudget = budget.Income / 30 // todo change it
+	db.Table("transactions").Select("sum(amount) as sum_costs").
+		Where(map[string]interface{}{"type": "day", "user_id": userId}).
+		Scan(budget)
+	currentDay, _ := strconv.Atoi(time.Now().Format("02"))
+	budget.TodayBudget = (budget.DailyBudget * currentDay) + budget.SumCosts
 }
 
 func GetBudget(command string, telegramId int) (response string) {
 	var budget Budget
-	db.Table("transactions").Select("sum(amount) as income").
-		Where(map[string]interface{}{"type": "month", "user_id": userId(telegramId)}).
-		Scan(&budget)
-	db.Table("transactions").Select("sum(amount) as income").
-		Where(map[string]interface{}{"type": "month", "user_id": userId(telegramId)}).
-		Scan(&budget)
+	budget.Get(userId(telegramId))
 
-	response = strconv.Itoa(budget.Income)
+	response += "Прибыль в месяц: " + strconv.Itoa(budget.Income) + "\n"
+	response += "Расходы в этом месяце: " + strconv.Itoa(budget.SumCosts) + "\n"
+	response += "Ежедневный бюджет: " + strconv.Itoa(budget.DailyBudget) + "\n"
+	response += "Остаток на сегодня: " + strconv.Itoa(budget.TodayBudget)
+	return
+}
+
+func Month(command string, telegramId int) (response string) {
+	var transactions []Transaction
+	db.Raw("SELECT*FROM transactions WHERE user_id = ? and date_part('month', date) = ?", userId(telegramId), time.Now().Format("01")).Scan(&transactions)
+	if transactions == nil {
+		response = "В этом месяце нет трат"
+		return
+	}
+	response = "В этом месяце:\n"
+	for _, transaction := range transactions {
+		response += "[" + transaction.Date.Format("02") + "] " + transaction.Name + " " + strconv.Itoa(transaction.Amount) + "\n"
+	}
 	return
 }
