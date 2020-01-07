@@ -45,7 +45,7 @@ func (r *Router) Add(message string, handler func(string, int) string, isPattern
 func (r *Router) DoCommand(message string, telegramId int) (response string) {
 	for _, route := range r.routes {
 		if route.IsPattern == true {
-			isMatch, _ := regexp.MatchString(`\d\s\w`, message)
+			isMatch, _ := regexp.MatchString(route.Message, message)
 			if isMatch == true {
 				response = route.Handler(message, telegramId)
 				return

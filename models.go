@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"time"
 )
 
 type User struct {
@@ -20,7 +19,7 @@ type Transaction struct {
 	Date   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 	Type   string
 	Name   string
-	Amount float64
+	Amount int
 }
 
 var db *gorm.DB
@@ -33,7 +32,7 @@ func initDB() *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
-	//db.LogMode(true)
+	db.LogMode(true)
 	db.AutoMigrate(&User{}, &Transaction{})
 	return db
 }

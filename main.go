@@ -7,7 +7,7 @@ func main() {
 	initBot()
 }
 
-func addTransaction(TelegramId int, Amount float64, Name string) {
+func addTransaction(TelegramId int, Amount int, Name string) {
 	db.Create(&Transaction{
 		UserID: userId(TelegramId),
 		Type:   "day",
