@@ -9,5 +9,6 @@ func (r *Router) Get() {
 	r.Add(`Бюджет`, GetBudget, false)
 	r.Add(`Месяц`, Month, false)
 	r.Add(`/month`, Month, false)
-	r.Add(`Регулярный`, AddIncome, false)
+	r.Add(`^\+\+\d+\s.*$`, AddRegularIncome, true)
+	r.Add(`^--\d+\s.*$`, AddRegularCost, true)
 }

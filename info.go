@@ -78,7 +78,7 @@ func GetBudget(command string, telegramId int) (response string) {
 
 func Month(command string, telegramId int) (response string) {
 	var transactions []Transaction
-	db.Raw("SELECT*FROM transactions WHERE user_id = ? and date_part('month', date) = ?", userId(telegramId), time.Now().Format("01")).Scan(&transactions)
+	db.Raw("SELECT*FROM transactions WHERE user_id = ? and date_part('month', date) = ? and type = 'day'", userId(telegramId), time.Now().Format("01")).Scan(&transactions)
 	if transactions == nil {
 		response = "В этом месяце нет трат"
 		return
@@ -88,4 +88,47 @@ func Month(command string, telegramId int) (response string) {
 		response += "[" + transaction.Date.Format("02") + "] " + transaction.Name + " " + strconv.Itoa(transaction.Amount) + "\n"
 	}
 	return
+}
+
+func AddRegularIncome(command string, telegramId int) (response string) {
+	namePattern := regexp.MustCompile(`\s(.*)`)
+	name := strings.TrimSpace(namePattern.FindString(command))
+
+	amountPattern := regexp.MustCompile(`(\d+)`)
+	amountString := amountPattern.FindString(command)
+	amount, err := strconv.Atoi(amountString)
+
+	if err != nil || amount == 0 {
+		return
+	}
+
+	db.Create(&Transaction{
+		UserID: userId(telegramId),
+		Type:   "month",
+		Name:   name,
+		Amount: amount})
+	response = "Добавлен регулярный доход: " + strconv.Itoa(amount)
+	return response
+}
+
+func AddRegularCost(command string, telegramId int) (response string) {
+	namePattern := regexp.MustCompile(`\s(.*)`)
+	name := strings.TrimSpace(namePattern.FindString(command))
+
+	amountPattern := regexp.MustCompile(`(\d+)`)
+	amountString := amountPattern.FindString(command)
+	amount, err := strconv.Atoi(amountString)
+	amount = amount*-1
+
+	if err != nil || amount == 0 {
+		return
+	}
+
+	db.Create(&Transaction{
+		UserID: userId(telegramId),
+		Type:   "month",
+		Name:   name,
+		Amount: amount})
+	response = "Добавлен регулярный расход: " + strconv.Itoa(amount)
+	return response
 }
