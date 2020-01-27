@@ -70,7 +70,7 @@ func initBot() {
 
 	_, err = bot.RemoveWebhook()
 	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 30
+	u.Timeout = 5
 	updates, err := bot.GetUpdatesChan(u)
 
 	for update := range updates {

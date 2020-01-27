@@ -7,8 +7,15 @@ import (
 	"time"
 )
 
+func start(command string, telegramId int) (response string) {
+	response = "Бот контроля личных финансов. Попробуйте отправить \"1000  Products\" "
+	return response
+}
+
 func info(command string, telegramId int) (response string) {
-	response = "Бот контроля личных финансовых. Попробуйте отправить \"1000  Products\" "
+	response = "Для начала можно задать регулярный доход на месяц. Пример: \n" +
+		"++60000 Зарплата" + "Расход: \n" + "--Аренда 35000 .\n" +
+		"после внесения данных сформируется ваша ежемесячная прибыль и лимит трат на день, дополнительно её можно будет посмотреть командой /budget"
 	return response
 }
 
@@ -118,7 +125,7 @@ func AddRegularCost(command string, telegramId int) (response string) {
 	amountPattern := regexp.MustCompile(`(\d+)`)
 	amountString := amountPattern.FindString(command)
 	amount, err := strconv.Atoi(amountString)
-	amount = amount*-1
+	amount = amount * -1
 
 	if err != nil || amount == 0 {
 		return
