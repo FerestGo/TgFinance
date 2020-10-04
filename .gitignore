@@ -5,9 +5,11 @@
 *.so
 *.dylib
 Thumbs.db
+TgFinance
 .DS_Store
 
 debug/
+volumes/
 .idea/
 nbproject
 
